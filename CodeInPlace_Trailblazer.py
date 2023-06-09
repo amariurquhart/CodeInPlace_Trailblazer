@@ -263,8 +263,6 @@ def play_game(canvas, borders, req_pieces, random, SCORE):
                         canvas.delete(scoretext[-2])
                     for trail_piece in trail:
                         canvas.delete(trail_piece)
-                        trail_leftx_dict.remove[trail_piece]
-                        trail_topy_dict.remove[trail_piece]
                 if color_cycle == spawns_dict[captured_object]:
                     canvas.delete(captured_object)
                     score_change = int(10 + 10 * score_multiplier)
@@ -274,37 +272,6 @@ def play_game(canvas, borders, req_pieces, random, SCORE):
                     scoretext.append(canvas.create_text(capturex + (BLOCK_SIZE/2), capturey + (BLOCK_SIZE/2), font='Times', font_size = 15, text=str(score_change), color = 'black'))
                     if len(scoretext) >= 2:
                         canvas.delete(scoretext[-2])
-        
-        if len(trail) > 0:
-            for trail_part in trail:
-                trailx = trail_leftx_dict[trail_part]
-                traily = trail_topy_dict[trail_part]
-                trailcaptured = canvas.find_overlapping(trailx, traily, trailx + BLOCK_SIZE, traily + BLOCK_SIZE)
-                if len(trailcaptured) > 1:
-                    for captured_object in trailcaptured:
-                        if captured_object not in req_pieces and captured_object not in borders and captured_object not in trail:
-                            if color_cycle != spawns_dict[captured_object]:
-                                canvas.delete(captured_object)
-                                score_change = int(-10)
-                                SCORE += score_change
-                                trail_length = 0
-                                print(SCORE)
-                                scoretext.append(canvas.create_text(trailx + (BLOCK_SIZE/2), traily + (BLOCK_SIZE/2), font='Times', font_size = 15, text=str(score_change), color = 'black'))
-                                if len(scoretext) >= 2:
-                                    canvas.delete(scoretext[-2])
-                                for trail_piece in trail:
-                                    canvas.delete(trail_piece)
-                                    trail_leftx_dict.remove[trail_piece]
-                                    trail_topy_dict.remove[trail_piece]
-                            if color_cycle == spawns_dict[captured_object]:
-                                canvas.delete(captured_object)
-                                score_change = int(10 + 10 * score_multiplier)
-                                SCORE += score_change
-                                trail_length += 1
-                                print(SCORE)
-                                scoretext.append(canvas.create_text(trailx + (BLOCK_SIZE/2), traily + (BLOCK_SIZE/2), font='Times', font_size = 15, text=str(score_change), color = 'black'))
-                                if len(scoretext) >= 2:
-                                    canvas.delete(scoretext[-2])
    
         'Runs the code that detects if the player has caught a score object underneath'
         
