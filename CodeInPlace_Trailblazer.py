@@ -7,6 +7,7 @@ CANVAS_WIDTH = 800
 CANVAS_HEIGHT = 600
 BLOCK_SIZE = 20
 DELAY = 0.01
+DURATION = 6000
 'This is the key for the player and the score items and their color options'
 color_key = {} 
 color_key[1] = 'red'
@@ -32,7 +33,7 @@ def main():
     
     time.sleep(DELAY*100)
     Creator_Title = canvas.create_text(CANVAS_WIDTH/2, CANVAS_HEIGHT*0.6, anchor = 'center', font='Times', font_size = 25, text='by AMARI', color='black')
-    Title_Instruction = canvas.create_text(CANVAS_WIDTH/2, CANVAS_HEIGHT*0.77, anchor = 'center', font='Arial', font_size = 15, text='ARROWS TO MOVE, SPACE TO CHANGE COLOR, CLICK TO START', color='black')
+    Title_Instruction = canvas.create_text(CANVAS_WIDTH/2, CANVAS_HEIGHT*0.77, anchor = 'center', font='Arial', font_size = 15, text='MATCH COLORS, GROW YOUR TRAIL, ARROWS TO MOVE, SPACE TO CHANGE COLOR, CLICK TO START', color='black')
     
     time.sleep(DELAY*100)
     canvas.wait_for_click()
@@ -103,7 +104,7 @@ def play_game(canvas, borders, req_pieces, random, SCORE):
     vertical = 0
     horizontal = BLOCK_SIZE
     color_cycle = 1
-    move_interval = 3
+    move_interval = 4
     move_counter = 0
     SCORE = 0
     trail_length = 0
@@ -120,18 +121,19 @@ def play_game(canvas, borders, req_pieces, random, SCORE):
     right_spawns = []
     bottom_spawns = []
     spawn_delay_counter = 0
-    spawn_delay = 300
+    spawn_delay = 200
     initial_delay = spawn_delay
-    enemy_accelerant = 14
+    enemy_accelerant = 13
     enemy_speed = int(BLOCK_SIZE / enemy_accelerant)
     score_change = 0
     scoretext = []
+    endgame = 0
     
     spawns_dict = {}
     trail_leftx_dict = {}
     trail_topy_dict = {}
     
-    while(True):
+    while endgame == 0:
         
         '''The following ~25 lines of code check where the player is 
         and takes keyboard inputs, arrow keys to initiate movement and 
@@ -139,13 +141,16 @@ def play_game(canvas, borders, req_pieces, random, SCORE):
         key = canvas.get_last_key_press() 
         player_x = canvas.get_left_x(player) 
         player_y = canvas.get_top_y(player)
-    
-        if trail_length >= 10:
+        
+        
+        if trail_length >= 11:
             move_interval = 1
-        if 5 <= trail_length < 10:
+        if 6 <= trail_length < 11:
             move_interval = 2
-        if trail_length < 5:
+        if 2 <= trail_length < 6:
             move_interval = 3
+        if trail_length < 2:
+            move_interval = 4
         
         'This is how the player changes colors, using the dictionary of colors above'
         if key == ' ':
@@ -205,29 +210,29 @@ def play_game(canvas, borders, req_pieces, random, SCORE):
             color_selector = random.randint(1, 3)
             left_spawns.append(canvas.create_oval(-random_placement, random_axis, (-random_placement + BLOCK_SIZE), (random_axis + BLOCK_SIZE), color_key[color_selector]))
             spawns_dict[left_spawns[-1]] = color_selector
-            if len(left_spawns) >= 8:
-                canvas.delete(left_spawns[-8])
+            if len(left_spawns) >= 11:
+                canvas.delete(left_spawns[-11])
             random_axis = (BLOCK_SIZE * random.randint(1, (xline_count-2)))
             random_placement = random.randint(BLOCK_SIZE, BLOCK_SIZE * 10)
             color_selector = random.randint(1, 3)
             top_spawns.append(canvas.create_oval(random_axis, -random_placement, (random_axis + BLOCK_SIZE), (-random_placement + BLOCK_SIZE), color_key[color_selector]))
             spawns_dict[top_spawns[-1]] = color_selector
-            if len(top_spawns) >= 8:
-                canvas.delete(top_spawns[-8])
+            if len(top_spawns) >= 11:
+                canvas.delete(top_spawns[-11])
             random_axis = (BLOCK_SIZE * random.randint(1, (yline_count-2)))
             random_placement = random.randint(BLOCK_SIZE, BLOCK_SIZE * 10)
             color_selector = random.randint(1, 3)
             right_spawns.append(canvas.create_oval((CANVAS_WIDTH + random_placement), random_axis, (CANVAS_WIDTH + random_placement + BLOCK_SIZE), (random_axis + BLOCK_SIZE), color_key[color_selector]))
             spawns_dict[right_spawns[-1]] = color_selector
-            if len(right_spawns) >= 8:
-                canvas.delete(right_spawns[-8])
+            if len(right_spawns) >= 11:
+                canvas.delete(right_spawns[-11])
             random_axis = (BLOCK_SIZE * random.randint(1, (xline_count-2)))
             random_placement = random.randint(BLOCK_SIZE, BLOCK_SIZE * 10)
             color_selector = random.randint(1, 3)
             bottom_spawns.append(canvas.create_oval(random_axis, (CANVAS_HEIGHT + random_placement), (random_axis + BLOCK_SIZE), (CANVAS_HEIGHT + random_placement + BLOCK_SIZE), color_key[color_selector]))
             spawns_dict[bottom_spawns[-1]] = color_selector
-            if len(bottom_spawns) >= 8:
-                canvas.delete(bottom_spawns[-8])
+            if len(bottom_spawns) >= 11:
+                canvas.delete(bottom_spawns[-11])
             spawn_boolean = 1
         
         for spawn in left_spawns:
@@ -257,7 +262,6 @@ def play_game(canvas, borders, req_pieces, random, SCORE):
                     score_change = int(-10)
                     SCORE += score_change
                     trail_length = 0
-                    print(SCORE)
                     scoretext.append(canvas.create_text(capturex + (BLOCK_SIZE/2), capturey + (BLOCK_SIZE/2), font='Times', font_size = 15, text=str(score_change), color = 'black'))
                     if len(scoretext) >= 2:
                         canvas.delete(scoretext[-2])
@@ -268,7 +272,6 @@ def play_game(canvas, borders, req_pieces, random, SCORE):
                     score_change = int(10 + 10 * score_multiplier)
                     SCORE += score_change
                     trail_length += 1
-                    print(SCORE)
                     scoretext.append(canvas.create_text(capturex + (BLOCK_SIZE/2), capturey + (BLOCK_SIZE/2), font='Times', font_size = 15, text=str(score_change), color = 'black'))
                     if len(scoretext) >= 2:
                         canvas.delete(scoretext[-2])
@@ -286,11 +289,31 @@ def play_game(canvas, borders, req_pieces, random, SCORE):
             spawn_delay_counter = 0
             spawn_boolean = 0
             if spawn_delay > int(initial_delay/20):
-                spawn_delay -= int(initial_delay/30)
-                print('speed increased')
-                enemy_accelerant -= 3
-            
+                spawn_delay -= int(initial_delay/15)
+                enemy_accelerant -= 1
+            if enemy_accelerant == 1:
+                endgame = 1
+                print('Game over!')
+            if enemy_accelerant == 3:
+                print('Game is ending!')
+                Warning = canvas.create_text(CANVAS_WIDTH/2, CANVAS_HEIGHT*0.7, anchor = 'center', font='Times', font_size = 15, text='GAME ENDING!!!', color='red')
+    EndScore = canvas.create_text(CANVAS_WIDTH/2, CANVAS_HEIGHT*0.77, anchor = 'center', font='Arial', font_size = 15, text='FINAL SCORE: ' + str(SCORE), color='black')
+    canvas.set_hidden(EndScore, True)
+    end_game(canvas, EndScore, SCORE)
     
+
+    
+def end_game(canvas, EndScore, SCORE):
+    time.sleep(DELAY*100)
+    TrailEcho = canvas.create_text(CANVAS_WIDTH*0.6, CANVAS_HEIGHT*.52, anchor = 'center', font='Times', font_size = 50, text='BLAZER', color='red')
+    TrailTitle = canvas.create_text(CANVAS_WIDTH/2, CANVAS_HEIGHT/2, anchor = 'center', font='Times', font_size = 50, text='TRAILBLAZER', color='black')
+    canvas.set_hidden(TrailEcho, True)
+    for i in range(10):
+        time.sleep(DELAY*20)
+        canvas.set_hidden(TrailEcho, False)
+        time.sleep(DELAY*20)
+        canvas.set_hidden(TrailEcho, True)
+    canvas.set_hidden(EndScore, False)    
 
 if __name__ == '__main__':
     main()
